@@ -1,153 +1,103 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>VTU Hub Dashboard</title>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VTU Hub Dashboard</title>
   <style>
-    body { font-family: Arial; margin: 20px; }
-    input, select, button { margin: 5px 0; padding: 5px; width: 100%; }
-    .section { border: 1px solid #ccc; padding: 10px; margin-bottom: 20px; border-radius: 8px; }
-    h2 { margin-top: 0; }
-    pre { background: #f4f4f4; padding: 10px; }
+    body { font-family: Arial, sans-serif; margin:0; padding:0; background:#f0f2f5; }
+    header { background:#4caf50; color:#fff; padding:10px; text-align:center; }
+    .container { max-width:800px; margin:auto; padding:20px; }
+    .tabs { display:flex; gap:10px; margin-bottom:20px; }
+    .tab { padding:10px 15px; background:#ddd; cursor:pointer; border-radius:5px; }
+    .tab.active { background:#4caf50; color:#fff; }
+    .section { display:none; background:#fff; padding:15px; border-radius:10px; margin-bottom:20px; }
+    .section.active { display:block; }
+    input, select { padding:8px; margin:5px 0; width:100%; }
+    button { padding:10px 15px; margin-top:10px; cursor:pointer; background:#4caf50; color:#fff; border:none; border-radius:5px; }
+    table { width:100%; border-collapse:collapse; margin-top:10px; }
+    th, td { border:1px solid #ccc; padding:8px; text-align:center; }
+    #logoutBtn { display:none; float:right; background:#f44336; }
+    h2 { margin-top:0; }
+    pre { background:#eee; padding:10px; border-radius:5px; overflow-x:auto; }
   </style>
 </head>
 <body>
+<header>
+  VTU Hub Dashboard
+  <button id="logoutBtn" onclick="logoutUser()">Logout</button>
+  <div id="welcomeMessage"></div>
+</header>
+<div class="container">
 
-  <h1>VTU Hub Dashboard</h1>
+  <div class="tabs">
+    <div class="tab active" data-target="regSection">Register</div>
+    <div class="tab" data-target="loginSection">Login</div>
+    <div class="tab" data-target="balanceSection">Balance</div>
+    <div class="tab" data-target="airtimeSection">Buy Airtime</div>
+    <div class="tab" data-target="dataSection">Buy Data</div>
+    <div class="tab" data-target="transSection">Transactions</div>
+  </div>
 
-  <!-- Register -->
-  <div class="section">
+  <!-- REGISTER -->
+  <div class="section active" id="regSection">
     <h2>Register</h2>
-    <input type="text" id="regName" placeholder="Full Name">
-    <input type="email" id="regEmail" placeholder="Email">
-    <input type="text" id="regPhone" placeholder="Phone">
-    <input type="password" id="regPassword" placeholder="Password">
+    <input type="text" id="regName" placeholder="Name" />
+    <input type="email" id="regEmail" placeholder="Email" />
+    <input type="text" id="regPhone" placeholder="Phone" />
+    <input type="password" id="regPassword" placeholder="Password" />
     <button onclick="registerUser()">Register</button>
     <pre id="regResult"></pre>
   </div>
 
-  <!-- Login -->
-  <div class="section">
+  <!-- LOGIN -->
+  <div class="section" id="loginSection">
     <h2>Login</h2>
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginPassword" placeholder="Password">
+    <input type="email" id="loginEmail" placeholder="Email" />
+    <input type="password" id="loginPassword" placeholder="Password" />
     <button onclick="loginUser()">Login</button>
     <pre id="loginResult"></pre>
   </div>
 
-  <!-- Balance -->
-  <div class="section">
+  <!-- BALANCE -->
+  <div class="section" id="balanceSection">
     <h2>Balance</h2>
-    <input type="text" id="balanceUserId" placeholder="User ID">
-    <button onclick="checkBalance()">Check Balance</button>
+    <button onclick="loadBalance()">Check Balance</button>
     <pre id="balanceResult"></pre>
   </div>
 
-  <!-- Buy Airtime -->
-  <div class="section">
+  <!-- AIRTIME -->
+  <div class="section" id="airtimeSection">
     <h2>Buy Airtime</h2>
-    <input type="text" id="airtimeUserId" placeholder="User ID">
-    <select id="airtimeNetwork">
-      <option>MTN</option>
-      <option>Glo</option>
-      <option>Airtel</option>
-      <option>9mobile</option>
-    </select>
-    <input type="number" id="airtimeAmount" placeholder="Amount">
-    <input type="text" id="airtimePhone" placeholder="Phone Number">
+    <select id="airtimeNetwork"></select>
+    <input type="text" id="airtimePhone" placeholder="Phone Number" />
+    <input type="number" id="airtimeAmount" placeholder="Amount" />
     <button onclick="buyAirtime()">Buy Airtime</button>
     <pre id="airtimeResult"></pre>
   </div>
 
-  <!-- Buy Data -->
-  <div class="section">
+  <!-- DATA -->
+  <div class="section" id="dataSection">
     <h2>Buy Data</h2>
-    <input type="text" id="dataUserId" placeholder="User ID">
-    <select id="dataNetwork">
-      <option>MTN</option>
-      <option>Glo</option>
-      <option>Airtel</option>
-      <option>9mobile</option>
-    </select>
-    <select id="dataPlan">
-      <option>500MB</option>
-      <option>1GB</option>
-      <option>2GB</option>
-    </select>
-    <input type="text" id="dataPhone" placeholder="Phone Number">
+    <select id="dataNetwork"></select>
+    <select id="dataPlan"></select>
+    <input type="text" id="dataPhone" placeholder="Phone Number" />
     <button onclick="buyData()">Buy Data</button>
     <pre id="dataResult"></pre>
   </div>
 
-  <!-- JS -->
-  <script>
-    const BASE_URL = "https://vtu-hub-sigma.vercel.app/api";
+  <!-- TRANSACTIONS -->
+  <div class="section" id="transSection">
+    <h2>Transactions</h2>
+    <button onclick="getTransactions()">Load Transactions</button>
+    <table id="transTable">
+      <thead><tr><th>Type</th><th>Amount</th><th>Date</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </div>
 
-    async function registerUser() {
-      const res = await fetch(`${BASE_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: document.getElementById('regName').value,
-          email: document.getElementById('regEmail').value,
-          phone: document.getElementById('regPhone').value,
-          password: document.getElementById('regPassword').value
-        })
-      });
-      const data = await res.json();
-      document.getElementById('regResult').innerText = JSON.stringify(data, null, 2);
-    }
+</div>
 
-    async function loginUser() {
-      const res = await fetch(`${BASE_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: document.getElementById('loginEmail').value,
-          password: document.getElementById('loginPassword').value
-        })
-      });
-      const data = await res.json();
-      document.getElementById('loginResult').innerText = JSON.stringify(data, null, 2);
-    }
-
-    async function checkBalance() {
-      const userId = document.getElementById('balanceUserId').value;
-      const res = await fetch(`${BASE_URL}/balance/${userId}`);
-      const data = await res.json();
-      document.getElementById('balanceResult').innerText = JSON.stringify(data, null, 2);
-    }
-
-    async function buyAirtime() {
-      const res = await fetch(`${BASE_URL}/buy-airtime`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: document.getElementById('airtimeUserId').value,
-          network: document.getElementById('airtimeNetwork').value,
-          amount: Number(document.getElementById('airtimeAmount').value),
-          phone: document.getElementById('airtimePhone').value
-        })
-      });
-      const data = await res.json();
-      document.getElementById('airtimeResult').innerText = JSON.stringify(data, null, 2);
-    }
-
-    async function buyData() {
-      const res = await fetch(`${BASE_URL}/buy-data`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          userId: document.getElementById('dataUserId').value,
-          network: document.getElementById('dataNetwork').value,
-          plan: document.getElementById('dataPlan').value,
-          phone: document.getElementById('dataPhone').value
-        })
-      });
-      const data = await res.json();
-      document.getElementById('dataResult').innerText = JSON.stringify(data, null, 2);
-    }
-  </script>
-
+<script src="app.js"></script>
 </body>
 </html>
