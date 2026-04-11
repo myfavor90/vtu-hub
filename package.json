@@ -1,15 +1,17 @@
+cat > ~/vtu-app/package.json << 'EOF'
 {
   "name": "vtu-hub",
   "version": "1.0.0",
-  "description": "VTU App API from myfavor90/vtu-hub",
-  "main": "api/index.js",
+  "description": "VTU App with Firebase",
+  "main": "server.js",
   "scripts": {
-    "start": "node api/index.js"
+    "start": "node server.js",
+    "dev": "node server.js"
   },
   "dependencies": {
-    "express": "^4.18.2"
-  },
-  "author": "myfavor90",
-  "license": "MIT"
+    "express": "^4.18.2",
+    "firebase": "^10.11.0"
+  }
 }
+EOF
 
